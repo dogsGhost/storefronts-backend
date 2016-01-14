@@ -12,7 +12,7 @@ var session = require('express-session');
 var routes = require('./routes/index');
 var login = require('./routes/login');
 var entry = require('./routes/entry');
-// var register = require('./routes/register');
+var register = require('./routes/register');
 
 var messages = require('./lib/messages');
 
@@ -25,13 +25,16 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(methodOverride());
+
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cookieParser());
-app.use(session({ resave: false,
-                  saveUninitialized: false,
-                  secret: 'old gold camera' }));
+// app.use(methodOverride());
+app.use(session({
+  resave: false,
+  saveUninitialized: false,
+  secret: 'old gold camera'
+}));
 app.use(messages);
 app.use(require('node-sass-middleware')({
   src: path.join(__dirname, 'public'),
@@ -50,9 +53,9 @@ app.route('/login')
 
 app.get('/logout', login.logout);
 
-// app.route('/register')
-//   .get(register.form)
-//   .post(register.submit);
+app.route('/register')
+  .get(register.form)
+  .post(register.submit);
 
 app.route('/entry')
   .get(entry.form)

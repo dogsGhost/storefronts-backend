@@ -9,15 +9,11 @@ block content
 
   form#entryForm(action='/entry', method='post')
     div
-      label(for='street') Street
-      select
-
-    div
       label(for='name') name of current or former resident
-      input#name(type='text', name='entry[name]')
+      input#name(type='text', name='entry[name]', placeholder='unknown')
     div
       label(for='address') address
-      input#address(type='text')
+      input#address(type='text', name='entry[address]' required)
     div
       p Is the property currently occupied?
       label(for='yes') yes

@@ -1,19 +1,21 @@
 extends layout
 
 block content
-  h2= title
-  hr
-  p Fill in the form below to sign in
+  .row
+    .col-md-8.col-md-offset-2
+      h2= pageName
+      hr
+      p Fill in the form below to sign in.
 
-  include ./messages.jade
+      form#loginForm(action='/login', method='post')
+        .form-group
+          label(for='username') Username
+          input#username.form-control(type='text', name='user[name]', placeholder='Username', required)
+        
+        .form-group
+          label(for='password') Password
+          input#password.form-control(type='password', name='user[pass]', required)
+        
+        input.btn.btn-primary(type='submit', value='Login')
 
-  form#signupForm(action='/login', method='post')
-    div
-      label(for='username') Username
-      br
-      input#username(type='text', name='user[name]', placeholder='Username')
-    div
-      label(for='password') Password
-      br
-      input#password(type='password', name='user[pass]')
-    input#submitBtn(type='submit', value='Login')
+  script(src='public/js/login.js')

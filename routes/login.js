@@ -1,28 +1,17 @@
 'use strict';
+const express = require('express');
+const router = express.Router();
 
-var User = require('../models/user');
+function capt(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
-exports.form = (req, res) => {
-  res.render('login', { title: 'Log In' });
-};
-
-exports.submit = (req, res, next) => {
-  let data = req.body.user;
-
-  User.authenticate(data.name, data.pass, (err, user) => {
-    if (err) return next(err);
-
-    if (user) {
-      req.session.uid = user.id;
-      res.redirect('/');
-
-    } else {
-      res.error('Invalid username/password combination.');
-      res.redirect('back');
-    }
+router.route('/')
+  .get((req, res, next) => {
+    res.render('login', { pageName: capt(req.baseUrl.split('/')[1]) });
+  })
+  .post((req, res, next) => {
+    console.log('req body is ', req.body);
   });
-};
 
-exports.logout = (req, res) => {
-
-};
+module.exports = router;

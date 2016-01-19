@@ -2,8 +2,9 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-  res.render('index', { pageName: 'home' });
-});
+router.route('/')
+  .get((req, res) => {
+    res.send('<pre>TODO: implement API</pre>');
+  });
 
 module.exports = router;

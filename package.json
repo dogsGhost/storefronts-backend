@@ -7,10 +7,8 @@
   "scripts": {
     "start": "node server.js",
     "start-dev": "nodemon server.js",
-    "server": "babel -d public/js src/js -s",
-    "client": "browserify src/js/main.js -t babelify -o public/js/bundle.js -d",
-    "build": "npm run client",
-    "watch": "node bin/watch.js"
+    "js-watch": "node bin/watch.js",
+    "sass-watch": "node-sass -w --source-map true src/sass/style.scss -o public/css"
   },
   "author": "David",
   "license": "ISC",

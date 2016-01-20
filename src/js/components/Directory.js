@@ -29,7 +29,7 @@ export default class Directory extends React.Component {
             <th>#</th>
             <th>Address</th>
             <th>Status</th>
-            <th>Current Resident</th>
+            <th>Current Occupant</th>
             <th>Notes</th>
             <th>&nbsp;</th>
           </tr>

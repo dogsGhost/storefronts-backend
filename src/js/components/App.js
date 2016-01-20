@@ -6,16 +6,14 @@ export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      stores: [],
-      streets: [],
-      categories: []
     };
   }
 
-  _loadFromServer(url) {
+  _loadFromServer(endPoint) {
     // use native fetch API
     if (window.fetch) {
-      let req = new Request(url, {
+      // TODO: add `/api` url prefix here once real endpoints being used
+      let req = new Request(`/${endPoint}`, {
         method: 'GET',
         cache: 'no-cache'
       });
@@ -24,10 +22,9 @@ export default class App extends React.Component {
         // check response is good
         if (res.ok) {
           res.json().then((json) => {
-            // TODO: change state obj prop to `[url.slice(1)]`
             // use the json as our data
             this.setState({
-              stores: json
+              [endPoint]: json
             });
           });
         } else {
@@ -44,16 +41,28 @@ export default class App extends React.Component {
     }
   }
 
+  componentWillMount() {
+    // loop through prop and set an array prop to state for each one
+    this.props.collections.forEach((item) => {
+      this.setState({
+        [item]: []
+      });
+    });
+  }
+
   componentDidMount() {
-    // TODO: loop through state obj props to populate?
-    this._loadFromServer(this.props.storesUrl);
+    // loop through state obj props to populate
+    Object.keys(this.state).forEach((key) => {
+      this._loadFromServer(key);
+    });
   }
 
   render() {
+    // TODO: change to pass all state props
     return (
       <div>
         <NewBusinessForm />
-        <Directory stores={this.state.stores} />
+        <Directory stores={this.state[this.props.collections[0]]} />
       </div>
     );
   }

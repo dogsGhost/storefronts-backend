@@ -9,6 +9,7 @@ export default class NewBusinessForm extends React.Component {
       isOccupied: '0',
       notes: '',
       occupantName: '',
+      // TODO: set default to first value from street dropdown
       street: 's1-ref-id'
     };
   }
@@ -28,12 +29,16 @@ export default class NewBusinessForm extends React.Component {
     };
     console.dir(obj);
 
+    // Check that the data is useful
+    if (!Number.isFinite(obj.address)) {
+
+    }
+
     // TODO: send request to server
 
     this.setState({
       address: '',
       category: '',
-      // isOccupied: '0', // Change to ref value of radio button?
       notes: '',
       occupantName: ''
     });
@@ -85,7 +90,7 @@ export default class NewBusinessForm extends React.Component {
                 defaultChecked
                 id="occupiedRadio1"
                 name="isOccupied"
-                onClick={this._handleInputChange.bind(this)}
+                onChange={this._handleInputChange.bind(this)}
                 type="radio"
                 value="0" />
               No
@@ -96,7 +101,7 @@ export default class NewBusinessForm extends React.Component {
               <input
                 id="occupiedRadio2"
                 name="isOccupied"
-                onClick={this._handleInputChange.bind(this)}
+                onChange={this._handleInputChange.bind(this)}
                 type="radio"
                 value="1" />
               Yes

@@ -8,6 +8,8 @@ const categorySchema = new Schema({
   }
 });
 
+categorySchema.set('toJSON', { versionKey: false });
+
 const Category = mongoose.model('Category', categorySchema);
 
 module.exports = Category;

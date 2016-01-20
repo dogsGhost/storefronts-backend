@@ -28,6 +28,8 @@ const businessSchema = new Schema({
   notes: String
 }, { collection: 'stores'});
 
+businessSchema.set('toJSON', { versionKey: false });
+
 const Business = mongoose.model('Business', businessSchema);
 
 module.exports = Business;

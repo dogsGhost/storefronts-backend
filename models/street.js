@@ -20,6 +20,8 @@ const streetSchema = new Schema({
   description: String
 });
 
+streetSchema.set('toJSON', { versionKey: false });
+
 const Street = mongoose.model('Street', streetSchema);
 
 module.exports = Street;

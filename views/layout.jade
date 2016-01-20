@@ -13,4 +13,13 @@ html
             .user-info.pull-right
               .user-name Logged in as #{locals.username}
               a.btn-logout.btn.btn-warning(href='/logout') logout
+        if pageName === 'Admin'
+          nav
+            ul.nav.nav-pills
+              li
+                a(href='/api/stores') stores
+              li
+                a(href='/api/streets') streets
+              li
+                a(href='/api/categories') categories
         block content

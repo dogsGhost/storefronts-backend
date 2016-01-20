@@ -5,6 +5,9 @@ const Category = require('./../models/category');
 const Street = require('./../models/street');
 const router = express.Router();
 
+// NOTE: test route
+const test = require('./test');
+
 const api = {
   fectch(modelName, cb) {
 
@@ -29,6 +32,13 @@ router.route('/').get((req, res) => {
   res.json({stores: [], streets: [], categories: []});
 });
 
+// TEST ROUTE
+router.route('/test')
+  .get(test)
+  .post((req, res) => {
+    res.json({ message: 'you did it' });
+  });
+
 router.route('/:collection/:streetName?')
   .get((req, res) => {
     let collection = req.params.collection;
@@ -36,7 +46,7 @@ router.route('/:collection/:streetName?')
     let models = ['Business', 'Street', 'Category'];
 
     // If the url is unexpected
-    if (collections.indexOf(collection) < 0) return res.status(404).send(404);
+    if (collections.indexOf(collection) < 0) return res.sendStatus(404);
 
     // if they want to view all the stores for a specific street
     if (collection === collections[0] && req.params.streetName) {
@@ -48,7 +58,7 @@ router.route('/:collection/:streetName?')
 
     // error if looking for child of collection besides stores
     if (collection !== collections[0] && req.params.streetName) {
-      res.status(404).send(404);
+      res.sendStatus(404);
       return;
     }
 

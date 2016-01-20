@@ -27,7 +27,7 @@ module.exports = (req, res) => {
     }
   ];
 
-  dummydata = dummydata.sort((a, b) => {
+  dummydata.sort((a, b) => {
     return a.address - b.address;
   });
 

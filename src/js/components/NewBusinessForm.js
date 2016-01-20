@@ -27,14 +27,17 @@ export default class NewBusinessForm extends React.Component {
       address: Number(this.state.address),
       isOccupied: !!Number(this.state.isOccupied)
     };
-    console.dir(obj);
 
-    // Check that the data is useful
-    if (!Number.isFinite(obj.address)) {
-
+    if (!obj.isOccupied) {
+      delete obj.category;
+      delete obj.occupantName;
     }
 
-    // TODO: send request to server
+    // Check that the data is useful
+    if (!Number.isFinite(obj.address)) return;
+
+    // submit
+    this.props.onStoreSubmit(obj);
 
     this.setState({
       address: '',

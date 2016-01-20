@@ -1,6 +1,7 @@
 import React from 'react';
 import NewBusinessForm from './NewBusinessForm';
 import Directory from './Directory';
+// import ajax from './../ajax';
 
 export default class App extends React.Component {
   constructor() {
@@ -9,18 +10,34 @@ export default class App extends React.Component {
     };
   }
 
+  _handleStoreSubmit(store) {
+    // TODO: set temp id to store
+    // store._id = ;
+    let newStores =
+      this.state[this.props.collections[0]]
+        .concat([store])
+        .sort((a, b) => {
+          return a.address - b.address;
+        });
+    this.setState({ [this.props.collections[0]]: newStores });
+  }
+
   _loadFromServer(endPoint) {
     // use native fetch API
     if (window.fetch) {
-      // TODO: add `/api` url prefix here once real endpoints being used
-      let req = new Request(`/${endPoint}`, {
+      let req = new Request(`/api/${endPoint}`, {
         method: 'GET',
         cache: 'no-cache'
       });
 
       fetch(req).then((res) => {
+        let contentType = res.headers.get('content-type');
         // check response is good
-        if (res.ok) {
+        if (
+          res.ok &&
+          contentType &&
+          contentType.indexOf('application/json') !== -1
+        ) {
           res.json().then((json) => {
             // use the json as our data
             this.setState({
@@ -58,11 +75,15 @@ export default class App extends React.Component {
   }
 
   render() {
-    // TODO: change to pass all state props
     return (
       <div>
-        <NewBusinessForm />
-        <Directory stores={this.state[this.props.collections[0]]} />
+        <NewBusinessForm
+          categories={[]}
+          onStoreSubmit={this._handleStoreSubmit.bind(this)}
+          streets={[]} />
+
+        <Directory
+          stores={this.state[this.props.collections[0]]} />
       </div>
     );
   }

@@ -15,9 +15,6 @@ const login = require('./routes/login');
 const admin = require('./routes/admin');
 const api = require('./routes/api');
 
-// NOTE: test route
-const test = require('./routes/test');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -65,8 +62,6 @@ app.get('/logout', (req, res) => {
 });
 app.use('/admin', admin);
 app.use('/api', api);
-// NOTE: TEST ROUTE
-app.get('/test', test);
 
 // start the app
 app.listen(PORT, () => {

@@ -8,14 +8,14 @@ export default class Directory extends React.Component {
   }
 
   render() {
-    let listings = this.props.data.map((store, index) => {
+    let listings = this.props.stores.map((store, index) => {
       return (
         <tr key={index}>
           <th>{index + 1}</th>
           <td>{store.address}</td>
           <td>{store.isOccupied ? 'occupied' : 'vacant'}</td>
           <td>{store.occupantName ? store.occupantName : '-'}</td>
-          <td>{store.notes ? 'Notes' : ''}</td>
+          <td>{store.notes ? <abbr title={store.notes}>Notes</abbr> : null}</td>
           <td><button className="btn btn-primary">Edit</button></td>
         </tr>
       );
@@ -23,6 +23,7 @@ export default class Directory extends React.Component {
 
     return (
       <table className="table table-striped">
+        <caption className="h4">Directory</caption>
         <thead>
           <tr>
             <th>#</th>

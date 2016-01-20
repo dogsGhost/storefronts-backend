@@ -1,7 +1,7 @@
 'use strict';
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const businessSchema = Schema({
+const businessSchema = new Schema({
   address: {
     type: Number,
     required: true
@@ -26,7 +26,7 @@ const businessSchema = Schema({
   },
 
   notes: String
-});
+}, { collection: 'stores'});
 
 const Business = mongoose.model('Business', businessSchema);
 

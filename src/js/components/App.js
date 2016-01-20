@@ -2,51 +2,58 @@ import React from 'react';
 import NewBusinessForm from './NewBusinessForm';
 import Directory from './Directory';
 
-var dummydata = [
-  {
-    address: 11500,
-    isOccupied: true,
-    occupantName: 'David',
-    street: 'Mackay',
-    category: 'residence',
-    notes: 'no big deal'
-  },
-  {
-    address: 11503,
-    isOccupied: false,
-    street: 'Mackay',
-    notes: 'looks like it used to be a pawn shop'
-  },
-  {
-    address: 11502,
-    isOccupied: false,
-    street: 'Mackay'
-  },
-  {
-    address: 11501,
-    isOccupied: true,
-    occupantName: 'Sal\'s Saloon',
-    street: 'Mackay'
-  }
-];
-
-dummydata = dummydata.sort((a, b) => {
-  return a.address - b.address;
-});
-
 export default class App extends React.Component {
-  // constructor() {
-  //   super();
-  //   this.state = {
-  //     stores: dummydata
-  //   };
-  // }
+  constructor() {
+    super();
+    this.state = {
+      stores: [],
+      streets: [],
+      categories: []
+    };
+  }
+
+  _loadFromServer(url) {
+    // use native fetch API
+    if (window.fetch) {
+      let req = new Request(url, {
+        method: 'GET',
+        cache: 'no-cache'
+      });
+
+      fetch(req).then((res) => {
+        // check response is good
+        if (res.ok) {
+          res.json().then((json) => {
+            // TODO: change state obj prop to `[url.slice(1)]`
+            // use the json as our data
+            this.setState({
+              stores: json
+            });
+          });
+        } else {
+          // bad response
+          console.error('promise resolved, but bad response from network');
+        }
+      }).catch((err) => {
+        // problem with request
+        console.error(`fecth did not resolve: ${err.message}`);
+      });
+    } else {
+      // fetch not supported...
+      console.error('fetch API not supported');
+    }
+  }
+
+  componentDidMount() {
+    // TODO: loop through state obj props to populate?
+    this._loadFromServer(this.props.storesUrl);
+  }
 
   render() {
     return (
       <div>
         <NewBusinessForm />
-        <Directory data={dummydata} />
+        <Directory stores={this.state.stores} />
       </div>
     );
   }

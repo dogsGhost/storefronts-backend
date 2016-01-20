@@ -13,10 +13,11 @@ var b = browserify({
 });
 
 function bundle() {
+  var t = Date.now();
   var stream = fs.createWriteStream('public/js/bundle.js');
 
   stream.on('finish', function () {
-    console.log('bundle updated ', new Date().getSeconds());
+    console.log('bundle updated ', ((Date.now() - t) / 1000));
   });
   b.bundle().pipe(stream);
 }

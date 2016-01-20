@@ -15,6 +15,9 @@ const login = require('./routes/login');
 const admin = require('./routes/admin');
 const api = require('./routes/api');
 
+// NOTE: test route
+const test = require('./routes/test');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -54,7 +57,7 @@ app.use((req, res, next) => {
 // set routes
 app.use('/', index);
 app.use('/login', login);
-app.use('/logout', (req, res) => {
+app.get('/logout', (req, res) => {
   // destroy session to effectively logout user
   req.session.destroy(() => {
     res.redirect('/');
@@ -62,6 +65,8 @@ app.use('/logout', (req, res) => {
 });
 app.use('/admin', admin);
 app.use('/api', api);
+// NOTE: TEST ROUTE
+app.get('/test', test);
 
 // start the app
 app.listen(PORT, () => {

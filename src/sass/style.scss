@@ -1,0 +1,37 @@
+label[for],
+input[type="radio"] {
+  cursor: pointer;
+}
+
+.page-header {
+  position: relative;
+}
+
+.message {
+  padding: .5em;
+}
+
+.user {
+  &-info {
+    text-align: right;
+  }
+
+  &-name {
+    margin: 0 0 .75em;
+  }
+}
+
+.occupant-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: 0.4s linear;
+
+  &.show {
+    padding: 1em 0 0;
+    max-height: 300px;
+  }
+}
+
+.store-notes {
+  padding-top: 1em;
+}

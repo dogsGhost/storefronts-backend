@@ -1,7 +1,92 @@
 import React from 'react';
+import NewBusinessForm from './NewBusinessForm';
+import Directory from './Directory';
+// import ajax from './../ajax';
 
-const App = () => (
-  <p>App loaded.</p>
-);
+export default class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+    };
+  }
+
+  _handleStoreSubmit(store) {
+    // TODO: set temp id to store
+    // store._id = ;
+    let newStores =
+      this.state[this.props.collections[0]]
+        .concat([store])
+        .sort((a, b) => {
+          return a.address - b.address;
+        });
+    this.setState({ [this.props.collections[0]]: newStores });
+  }
+
+  _loadFromServer(endPoint) {
+    // use native fetch API
+    if (window.fetch) {
+      let req = new Request(`/api/${endPoint}`, {
+        method: 'GET',
+        cache: 'no-cache'
+      });
+
+      fetch(req).then((res) => {
+        let contentType = res.headers.get('content-type');
+        // check response is good
+        if (
+          res.ok &&
+          contentType &&
+          contentType.indexOf('application/json') !== -1
+        ) {
+          res.json().then((json) => {
+            // use the json as our data
+            this.setState({
+              [endPoint]: json
+            });
+          });
+        } else {
+          // bad response
+          console.error('promise resolved, but bad response from network');
+        }
+      }).catch((err) => {
+        // problem with request
+        console.error(`fecth did not resolve: ${err.message}`);
+      });
+    } else {
+      // fetch not supported...
+      console.error('fetch API not supported');
+    }
+  }
+
+  componentWillMount() {
+    // loop through prop and set an array prop to state for each one
+    this.props.collections.forEach((item) => {
+      this.setState({
+        [item]: []
+      });
+    });
+  }
+
+  componentDidMount() {
+    // loop through state obj props to populate
+    Object.keys(this.state).forEach((key) => {
+      this._loadFromServer(key);
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <NewBusinessForm
+          categories={[]}
+          onStoreSubmit={this._handleStoreSubmit.bind(this)}
+          streets={[]} />
+
+        <Directory
+          stores={this.state[this.props.collections[0]]} />
+      </div>
+    );
+  }
+};
 
 export default App;

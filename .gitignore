@@ -1,7 +1,7 @@
 # Logs
 logs
 *.log
-
+.sass-cache
 # Runtime data
 pids
 *.pid
@@ -29,5 +29,4 @@ node_modules
 # Debug log from npm
 npm-debug.log
 
-config.js
 public

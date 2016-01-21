@@ -10,6 +10,12 @@ const models = {
   Category,
   Street
 };
+// collectionName: modelName
+const dbKey = {
+  categories: 'Category',
+  stores: 'Business',
+  streets: 'Street'
+};
 
 // NOTE: test route
 const test = require('./test');
@@ -19,22 +25,12 @@ router.route('/').get((req, res) => {
 });
 
 // NOTE: TEST ROUTE
-router.route('/test')
-  .get(test)
-  .post((req, res) => {
-    res.json({ message: 'you did it' });
-  });
+router.route('/test').get(test);
 
 router.route('/:collection/:streetName?')
   .get((req, res) => {
     let collection = req.params.collection;
     let streetName = req.params.streetName;
-    // collectionName: modelName
-    let dbKey = {
-      categories: 'Category',
-      stores: 'Business',
-      streets: 'Street'
-    };
 
     // If the url is unexpected
     if (!dbKey[collection]) return res.sendStatus(404);
@@ -61,8 +57,44 @@ router.route('/:collection/:streetName?')
     });
   })
   .post((req, res) => {
-    // TODO
-    res.json({ message: 'TODO: set up POST response' });
+    const obj = req.body;
+    const collection = req.params.collection;
+    const model = models[dbKey[collection]];
+    // Make an object with the values we need to use to check for duplicates
+    const makeTestObj = (srcObj, collectionName) => {
+      let newObj = {};
+      const testKey = {
+        categories: ['name'],
+        streets: ['name', 'city', 'state'],
+        stores: ['address', 'street']
+      };
+      testKey[collectionName].forEach((val) => {
+        if (srcObj[val]) newObj[val] = srcObj[val];
+      });
+      return newObj;
+    };
+
+    // If the url or request body is unexpected
+    if (!dbKey[collection] || typeof obj !== 'object') {
+      return res.sendStatus(404);
+    }
+
+    model.findOne(makeTestObj(obj, collection), (err, results) => {
+      let entry;
+      // error with db/mongoose
+      if (err) return res.json(err);
+      // this means entry already exists
+      if (results) return res.json({ message: 'duplicate entry' });
+      // we can try to save the entry
+      entry = new model(obj);
+      // save the sample user
+      entry.save(function(err) {
+        // If model fails validation
+        if (err) return res.json(err);
+        // otherwise we've saved it
+        res.json({ success: true, data: entry });
+      });
+    });
   });
 
 module.exports = router;

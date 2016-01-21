@@ -23,7 +23,7 @@ export default class Directory extends React.Component {
 
     return (
       <table className="table table-striped">
-        <caption className="h4">Directory</caption>
+        <caption className="h3">Directory</caption>
         <thead>
           <tr>
             <th>#</th>

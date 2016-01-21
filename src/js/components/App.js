@@ -6,20 +6,16 @@ import Directory from './Directory';
 export default class App extends React.Component {
   constructor() {
     super();
-    this.state = {
-    };
   }
 
   _handleStoreSubmit(store) {
-    // TODO: set temp id to store
-    // store._id = ;
-    let newStores =
-      this.state[this.props.collections[0]]
-        .concat([store])
-        .sort((a, b) => {
-          return a.address - b.address;
-        });
+    // optimistically update the stores
+    store._id = `temp-id-${Date.now()}`;
+    let newStores = this.state[this.props.collections[0]].concat([store]);
+    newStores.sort((a, b) => a.address - b.address);
     this.setState({ [this.props.collections[0]]: newStores });
+
+    // TODO: POST store to server
   }
 
   _loadFromServer(endPoint) {
@@ -78,12 +74,11 @@ export default class App extends React.Component {
     return (
       <div>
         <NewBusinessForm
-          categories={[]}
+          categories={this.state.categories}
           onStoreSubmit={this._handleStoreSubmit.bind(this)}
-          streets={[]} />
+          streets={this.state.streets} />
 
-        <Directory
-          stores={this.state[this.props.collections[0]]} />
+        <Directory stores={this.state.test} />
       </div>
     );
   }

@@ -1,5 +1,6 @@
 'use strict';
 const express = require('express');
+const mongoose = require('mongoose');
 const Business = require('./../models/business');
 const Category = require('./../models/category');
 const Street = require('./../models/street');
@@ -17,42 +18,31 @@ const dbKey = {
   streets: 'Street'
 };
 
-// NOTE: test route
-const test = require('./test');
-
 router.route('/').get((req, res) => {
   res.sendStatus(404);
 });
 
-// NOTE: TEST ROUTE
-router.route('/test').get(test);
-
-router.route('/:collection/:streetName?')
+router.route('/:collection')
   .get((req, res) => {
-    let collection = req.params.collection;
-    let streetName = req.params.streetName;
+    const collection = req.params.collection;
+    let query;
 
     // If the url is unexpected
     if (!dbKey[collection]) return res.sendStatus(404);
 
-    // if they want to view all the stores for a specific street
-    if (collection === 'stores' && streetName) {
-      // TODO: should be able to pass extra param to api.fetch that lets us
-      // filter query by a prop value
-      res.send(`<pre>TODO: implement /stores/${streetName} API</pre>`);
-      return;
-    }
-
-    // error if looking for child of collection besides stores
-    if (collection !== 'stores' && streetName) {
-      res.sendStatus(404);
-      return;
-    }
-
     // If its the correct url query the database
-    models[dbKey[collection]].find((err, results) => {
+    query = models[dbKey[collection]].find();
+
+    // Stores have to have to be populated before being returned
+    if (collection === 'stores') query.populate('category street');
+
+    // Return our results as json
+    query.exec((err, results) => {
       if (err) return res.send(err);
-      if (results) return res.json(results);
+      if (results) {
+        res.set('Content-Type', 'application/json');
+        return res.json(results);
+      }
       res.sendStatus(500);
     });
   })
@@ -66,7 +56,7 @@ router.route('/:collection/:streetName?')
       const testKey = {
         categories: ['name'],
         streets: ['name', 'city', 'state'],
-        stores: ['address', 'street']
+        stores: ['address']
       };
       testKey[collectionName].forEach((val) => {
         if (srcObj[val]) newObj[val] = srcObj[val];
@@ -77,6 +67,52 @@ router.route('/:collection/:streetName?')
     // If the url or request body is unexpected
     if (!dbKey[collection] || typeof obj !== 'object') {
       return res.sendStatus(404);
+    }
+
+    // stores are a special case
+    if (collection === 'stores') {
+      // get the stores that match address
+      model.find(makeTestObj(obj, collection))
+        // same address may exist at different streets
+        .populate('street', '_id')
+        .exec((err, results) => {
+          if (err) return res.json(err);
+          // if there are actually results we have to confirm duplicate
+          if (results.length) {
+            console.log('results: ', results);
+            return res.json({ message: 'duplicate entry' });
+            // TODO
+            // let exists = false;
+            // // check if street name matches the one we want to add
+            // results.forEach((item) => {
+            //   if (item.street.name === obj) exists = true;
+            // });
+          }
+
+          let entry = {
+            address: obj.address,
+            isOccupied: obj.isOccupied,
+            street: obj.street
+          };
+
+          // Add optional properties
+          if (obj.category) entry.category = obj.category;
+          if (obj.notes) entry.notes = obj.notes;
+          if (obj.occupantName) entry.occupantName = obj.occupantName;
+
+          let business = new Business(entry);
+          business.save(function(err) {
+            // If model fails validation
+            if (err) {
+              console.log(err);
+              return res.json(err);
+            }
+            // otherwise we've saved it
+            return res.set('Content-Type', 'application/json')
+              .json({data: business});
+          });
+        });
+      return;
     }
 
     model.findOne(makeTestObj(obj, collection), (err, results) => {
@@ -92,8 +128,7 @@ router.route('/:collection/:streetName?')
         // If model fails validation
         if (err) return res.json(err);
         // otherwise we've saved it
-        res.set('Content-Type', 'application/json');
-        res.json({ data: entry });
+        res.set('Content-Type', 'application/json').json({ data: entry });
       });
     });
   });

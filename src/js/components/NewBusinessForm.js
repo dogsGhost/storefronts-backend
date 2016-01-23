@@ -9,8 +9,7 @@ export default class NewBusinessForm extends React.Component {
       isOccupied: '0',
       notes: '',
       occupantName: '',
-      // TODO: set default to first value from street dropdown
-      street: 's1-ref-id'
+      street: ''
     };
   }
 
@@ -20,7 +19,6 @@ export default class NewBusinessForm extends React.Component {
     if (newCatName) {
       // post a new category
       this.props.onNewCatSubmit({ name: newCatName }, input);
-      // input.value = '';
     }
   }
 
@@ -58,8 +56,17 @@ export default class NewBusinessForm extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
+    // Set default street
+    if (this.props.streets.length) {
+      let id = this.props.streets[0]._id;
+      this.setState({
+        street: id
+      });
+    }
     // When a new category is added automatically set it as the form's category
-    this.setState({ category: newProps.defaultCategory });
+    if (!this.state.category) {
+      this.setState({ category: newProps.defaultCategory });
+    }
   }
 
   render() {
@@ -91,7 +98,7 @@ export default class NewBusinessForm extends React.Component {
               className="form-control"
               name="street"
               onChange={this._handleInputChange.bind(this)}
-              >
+              value={this.state.street}>
               {streetOptions}
             </select>
           </div>

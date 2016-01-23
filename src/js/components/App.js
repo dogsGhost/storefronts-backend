@@ -34,19 +34,25 @@ export default class App extends React.Component {
   }
 
   _handleStoreSubmit(store) {
-    // optimistically update the stores
-    store._id = `temp-id-${Date.now()}`;
-    let newStores = this.state.test.concat([store]);
-    newStores.sort((a, b) => a.address - b.address);
-    this.setState({ test: newStores });
-
-    // TODO: POST store to server
+    ajax.sendRequest({
+      url: '/api/stores',
+      method: 'POST',
+      body: JSON.stringify(store),
+      success: (res) => {
+        res.json().then((json) => {
+          this.setState({
+            stores:
+              this._sortArray(this.state.stores.concat([json.data]), 'stores')
+          });
+        });
+      }
+    });
   }
 
   _sortArray(arr, collection) {
     // Lets us sort our collections on specific values
     const sortKey = {
-      test: 'address',
+      stores: 'address',
       categories: 'name',
       streets: '_id'
     }
@@ -97,7 +103,7 @@ export default class App extends React.Component {
           onStoreSubmit={this._handleStoreSubmit.bind(this)}
           streets={this.state.streets} />
 
-        <Directory stores={this.state.test} />
+            <Directory stores={this.state.stores} />
       </div>
     );
   }

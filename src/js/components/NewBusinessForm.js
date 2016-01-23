@@ -14,6 +14,16 @@ export default class NewBusinessForm extends React.Component {
     };
   }
 
+  _handleNewCat(e) {
+    let input = this.refs.newCategoryInput;
+    let newCatName = input.value.trim();
+    if (newCatName) {
+      // post a new category
+      this.props.onNewCatSubmit({ name: newCatName }, input);
+      // input.value = '';
+    }
+  }
+
   _handleInputChange(e) {
     // as a shortcut, input names match our state properties
     this.setState({ [e.target.name]: e.target.value });
@@ -47,10 +57,27 @@ export default class NewBusinessForm extends React.Component {
     });
   }
 
+  componentWillReceiveProps(newProps) {
+    // When a new category is added automatically set it as the form's category
+    this.setState({ category: newProps.defaultCategory });
+  }
+
   render() {
     // user class change to trigger hide/show animation
     let detailsClasses =
       'occupant-details' + (Number(this.state.isOccupied) ? ' show': '');
+
+    let streetOptions = this.props.streets.map((street, index) => {
+      return (
+        <option key={index} value={street._id}>{street.name}</option>
+      );
+    });
+
+    let categoryOptions = this.props.categories.map((cat, index) => {
+      return (
+        <option key={index} value={cat._id}>{cat.name}</option>
+      );
+    });
 
     return (
       <form
@@ -64,10 +91,8 @@ export default class NewBusinessForm extends React.Component {
               className="form-control"
               name="street"
               onChange={this._handleInputChange.bind(this)}
-              value={this.state.street}>
-              <option value="s1-ref-id">street 1</option>
-              <option value="s2-ref-id">street 2</option>
-              <option value="s3-ref-id">street 3</option>
+              >
+              {streetOptions}
             </select>
           </div>
         </div>
@@ -122,18 +147,39 @@ export default class NewBusinessForm extends React.Component {
                 type="text"
                 value={this.state.occupantName} />
             </div>
+            <div className="container-fluid">
+              <div className="row">
+                <div className="col-sm-6">
+                  <label>Type of Business</label>
+                  <select
+                    className="form-control"
+                    name="category"
+                    onChange={this._handleInputChange.bind(this)}
+                    value={this.state.category}>
+                    <option value="">None</option>
+                    {categoryOptions}
+                  </select>
+                </div>
 
-            <label>Type of Business</label>
-            <select
-              className="form-control"
-              name="category"
-              onChange={this._handleInputChange.bind(this)}
-              value={this.state.category}>
-              <option value="">select a category</option>
-              <option value="c1-ref-id">category 1</option>
-              <option value="c2-ref-id">category 2</option>
-              <option value="c3-ref-id">category 3</option>
-            </select>
+                <div className="col-sm-6">
+                  <label>Add New Category</label>
+                  <div className="form-inline">
+                    <div className="form-group">
+                      <input
+                        className="form-control"
+                        name="newCategory"
+                        ref="newCategoryInput" />
+                      <button
+                        className="btn btn-info btn-newCat"
+                        onClick={this._handleNewCat.bind(this)}
+                        type="button">
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="form-group store-notes">

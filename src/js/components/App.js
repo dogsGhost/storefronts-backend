@@ -1,72 +1,89 @@
 import React from 'react';
 import NewBusinessForm from './NewBusinessForm';
 import Directory from './Directory';
-// import ajax from './../ajax';
+import ajax from './../ajax';
 
 export default class App extends React.Component {
   constructor() {
     super();
+    this.state = {
+      latestCat: ''
+    }
+  }
+
+  _handleNewCatSubmit(catObj, srcEle) {
+    ajax.sendRequest({
+      url: '/api/categories',
+      method: 'POST',
+      body: JSON.stringify(catObj),
+      success: (res) => {
+        res.json().then((json) => {
+          this.setState({
+            categories:
+              this._sortArray(
+                this.state.categories.concat([json.data]),
+                'categories'
+              ),
+            // pass the id down to form to set as category value
+            latestCat: json.data._id
+          });
+          srcEle.value = '';
+        });
+      }
+    });
   }
 
   _handleStoreSubmit(store) {
     // optimistically update the stores
     store._id = `temp-id-${Date.now()}`;
-    let newStores = this.state[this.props.collections[0]].concat([store]);
+    let newStores = this.state.test.concat([store]);
     newStores.sort((a, b) => a.address - b.address);
-    this.setState({ [this.props.collections[0]]: newStores });
+    this.setState({ test: newStores });
 
     // TODO: POST store to server
   }
 
-  _loadFromServer(endPoint) {
-    // use native fetch API
-    if (window.fetch) {
-      let req = new Request(`/api/${endPoint}`, {
-        method: 'GET',
-        cache: 'no-cache'
-      });
-
-      fetch(req).then((res) => {
-        let contentType = res.headers.get('content-type');
-        // check response is good
-        if (
-          res.ok &&
-          contentType &&
-          contentType.indexOf('application/json') !== -1
-        ) {
-          res.json().then((json) => {
-            // use the json as our data
-            this.setState({
-              [endPoint]: json
-            });
-          });
-        } else {
-          // bad response
-          console.error('promise resolved, but bad response from network');
-        }
-      }).catch((err) => {
-        // problem with request
-        console.error(`fecth did not resolve: ${err.message}`);
-      });
-    } else {
-      // fetch not supported...
-      console.error('fetch API not supported');
+  _sortArray(arr, collection) {
+    // Lets us sort our collections on specific values
+    const sortKey = {
+      test: 'address',
+      categories: 'name',
+      streets: '_id'
     }
+    return arr.sort((a, b) => {
+        if (a[sortKey[collection]] > b[sortKey[collection]]) return 1;
+        if (a[sortKey[collection]] < b[sortKey[collection]]) return -1;
+        return 0;
+    });
+  }
+
+  _loadFromServer(endPoint) {
+    ajax.sendRequest({
+      url: `/api/${endPoint}`,
+      success: (res) => {
+        res.json().then((json) => {
+          // use the json as our data
+          this.setState({
+            [endPoint]: this._sortArray(json, endPoint)
+          });
+        });
+      }
+    });
   }
 
   componentWillMount() {
     // loop through prop and set an array prop to state for each one
-    this.props.collections.forEach((item) => {
+    this.props.collections.forEach((path) => {
       this.setState({
-        [item]: []
+        [path]: []
       });
     });
   }
 
   componentDidMount() {
     // loop through state obj props to populate
-    Object.keys(this.state).forEach((key) => {
-      this._loadFromServer(key);
+    this.props.collections.forEach((path) => {
+      this._loadFromServer(path);
     });
   }
 
@@ -75,6 +92,8 @@ export default class App extends React.Component {
       <div>
         <NewBusinessForm
           categories={this.state.categories}
+          defaultCategory={this.state.latestCat}
+          onNewCatSubmit={this._handleNewCatSubmit.bind(this)}
           onStoreSubmit={this._handleStoreSubmit.bind(this)}
           streets={this.state.streets} />
 
@@ -83,5 +102,3 @@ export default class App extends React.Component {
     );
   }
 };
-
-export default App;

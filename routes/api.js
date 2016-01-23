@@ -92,7 +92,8 @@ router.route('/:collection/:streetName?')
         // If model fails validation
         if (err) return res.json(err);
         // otherwise we've saved it
-        res.json({ success: true, data: entry });
+        res.set('Content-Type', 'application/json');
+        res.json({ data: entry });
       });
     });
   });

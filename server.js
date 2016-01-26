@@ -64,6 +64,7 @@ app.use('/admin', admin);
 app.use('/api', api);
 
 // start the app
-app.listen(PORT, () => {
+app.listen(PORT, (err) => {
+  if (err) console.log(err);
   console.log(`running on port ${PORT}`);
 })

@@ -1,10 +1,14 @@
 'use strict';
 const express = require('express');
-const mongoose = require('mongoose');
+const cors = require('cors');
+const whitelist = require('../config').whitelist;
 const Business = require('./../models/business');
 const Category = require('./../models/category');
 const Street = require('./../models/street');
 const router = express.Router();
+const corsOptions = {
+  origin: whitelist
+};
 // allows us to reference model name from a string
 const models = {
   Business,
@@ -23,7 +27,7 @@ router.route('/').get((req, res) => {
 });
 
 router.route('/:collection')
-  .get((req, res) => {
+  .get(cors(corsOptions), (req, res) => {
     const collection = req.params.collection;
     let query;
 

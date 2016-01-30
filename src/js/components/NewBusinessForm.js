@@ -64,9 +64,7 @@ export default class NewBusinessForm extends React.Component {
       });
     }
     // When a new category is added automatically set it as the form's category
-    if (!this.state.category) {
-      this.setState({ category: newProps.defaultCategory });
-    }
+    this.setState({ category: newProps.defaultCategory });
   }
 
   render() {
